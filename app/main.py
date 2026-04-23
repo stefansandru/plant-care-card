@@ -42,7 +42,9 @@ async def lifespan(app: FastAPI):
     # Initialize the pytorch model
     model = Model()
     model.load_state_dict(torch.load(
-        abs_path(CONFIG['MODEL_PATH']), map_location=torch.device(CONFIG['DEVICE'])))
+        abs_path(CONFIG['MODEL_PATH']),
+        map_location=torch.device(CONFIG['DEVICE'])
+    ))
     model.eval()
 
     with open(abs_path(CONFIG['CLASS_MAP_PATH']), 'r') as f:
@@ -85,6 +87,15 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"])
 # Load custom exception handlers
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, python_exception_handler)
+
+# Serve the frontend UI
+app.mount("/static", StaticFiles(directory=abs_path("static")), name="static")
+
+
+@app.get('/')
+async def root():
+    """Redirect root to the frontend UI."""
+    return RedirectResponse(url="/static/index.html")
 
 
 @app.post('/api/v1/predict',

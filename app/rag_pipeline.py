@@ -245,9 +245,7 @@ def _build_graph():
 # Public API
 # ---------------------------------------------------------------------------
 
-def generate_plant_care_card(
-    plant_name: str, max_revisions: int = 2
-) -> PlantCareCard:
+def generate_plant_care_card(plant_name: str, max_revisions: int = 2) -> PlantCareCard:
     """
     Run the full RAG pipeline: research → generate → validate → (loop or end).
 

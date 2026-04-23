@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plant Care Card — AI Plant Identifier</title>
+  <meta name="description" content="Upload a photo of your plant and get an AI-powered identification with a detailed care card including watering, lighting, and growing tips." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <!-- Animated background blobs -->
+  <div class="bg-blobs" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <header class="site-header">
+    <div class="logo">
+      <span class="logo-icon">🌿</span>
+      <span class="logo-text">PlantCare<span class="logo-accent">AI</span></span>
+    </div>
+    <nav class="header-nav">
+      <a href="#upload-section" class="nav-link">Identify</a>
+      <a href="#how-it-works" class="nav-link">How It Works</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero" id="upload-section">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          Identify Your Plant<br />
+          <span class="hero-highlight">Get a Care Card Instantly</span>
+        </h1>
+        <p class="hero-subtitle">
+          Upload a photo of your plant and our AI will classify it and generate a comprehensive care guide using advanced research.
+        </p>
+      </div>
+
+      <!-- Upload Card -->
+      <div class="upload-card" id="upload-card">
+        <div class="upload-zone" id="upload-zone" tabindex="0" role="button" aria-label="Click or drag an image to upload">
+          <div class="upload-zone-content" id="upload-zone-content">
+            <div class="upload-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <p class="upload-text">Drop your plant photo here</p>
+            <p class="upload-hint">or click to browse · JPG, PNG, WebP</p>
+          </div>
+          <img class="upload-preview" id="upload-preview" alt="Plant preview" />
+          <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp,image/bmp,image/tiff" hidden />
+        </div>
+
+        <div class="upload-actions">
+          <button class="btn btn-secondary" id="btn-clear" disabled>Clear</button>
+          <button class="btn btn-primary" id="btn-classify" disabled>
+            <span class="btn-label">Identify Plant</span>
+            <span class="btn-spinner" hidden></span>
+          </button>
+        </div>
+
+        <div class="mode-toggle">
+          <label class="toggle-label" for="mode-care-card">
+            <input type="checkbox" id="mode-care-card" checked />
+            <span class="toggle-switch"></span>
+            <span class="toggle-text">Generate full care card (slower, uses AI research)</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Loading State -->
+    <section class="loading-section" id="loading-section" hidden>
+      <div class="loading-card">
+        <div class="loading-spinner"></div>
+        <p class="loading-text" id="loading-text">Analyzing your plant...</p>
+        <p class="loading-subtext">This may take a moment while our AI researches your plant</p>
+      </div>
+    </section>
+
+    <!-- Error State -->
+    <div class="error-toast" id="error-toast" hidden>
+      <span class="error-icon">⚠️</span>
+      <span class="error-message" id="error-message"></span>
+      <button class="error-close" id="error-close" aria-label="Dismiss">×</button>
+    </div>
+
+    <!-- Results Section -->
+    <section class="results-section" id="results-section" hidden>
+      <!-- Classification Result -->
+      <div class="classification-card" id="classification-card">
+        <div class="classification-header">
+          <img class="classification-img" id="result-img" alt="Classified plant" />
+          <div class="classification-info">
+            <span class="classification-badge" id="confidence-badge">—</span>
+            <h2 class="classification-name" id="result-name">—</h2>
+            <p class="classification-latin" id="result-latin"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plant Care Card -->
+      <div class="care-card" id="care-card" hidden>
+        <div class="care-card-header">
+          <h2 class="care-card-title">
+            <span class="care-icon">🌱</span>
+            Plant Care Card
+          </h2>
+          <p class="care-card-subtitle" id="care-summary"></p>
+        </div>
+
+        <div class="care-grid">
+          <!-- Identity -->
+          <div class="care-block care-block-identity">
+            <h3 class="care-block-title">🪪 Identity</h3>
+            <div class="care-detail-list" id="identity-details"></div>
+          </div>
+
+          <!-- Environment -->
+          <div class="care-block care-block-env">
+            <h3 class="care-block-title">🌤️ Environment</h3>
+            <div class="care-detail-list" id="env-details"></div>
+          </div>
+
+          <!-- Watering -->
+          <div class="care-block care-block-water">
+            <h3 class="care-block-title">💧 Watering</h3>
+            <div class="care-detail-list" id="water-details"></div>
+          </div>
+
+          <!-- Growth -->
+          <div class="care-block care-block-growth">
+            <h3 class="care-block-title">📏 Growth</h3>
+            <div class="care-detail-list" id="growth-details"></div>
+          </div>
+
+          <!-- Maintenance -->
+          <div class="care-block care-block-maintenance">
+            <h3 class="care-block-title">🛠️ Maintenance</h3>
+            <div class="care-detail-list" id="maintenance-details"></div>
+          </div>
+
+          <!-- Health & Safety -->
+          <div class="care-block care-block-health">
+            <h3 class="care-block-title">🛡️ Health & Safety</h3>
+            <div class="care-detail-list" id="health-details"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-section" id="how-it-works">
+      <h2 class="section-title">How It Works</h2>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <div class="step-icon">📸</div>
+          <h3 class="step-title">Upload Photo</h3>
+          <p class="step-desc">Take or upload a clear photo of your plant's leaves or fruit.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <div class="step-icon">🤖</div>
+          <h3 class="step-title">AI Classification</h3>
+          <p class="step-desc">EfficientNet-B1 identifies your plant from 30 species with high accuracy.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <div class="step-icon">🔬</div>
+          <h3 class="step-title">Research & Generate</h3>
+          <p class="step-desc">A Mistral AI RAG pipeline researches and generates a validated care card.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>PlantCare AI — Built with EfficientNet-B1 · Mistral AI · LangGraph</p>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
