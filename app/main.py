@@ -22,13 +22,12 @@ from PIL import Image
 import numpy as np
 import torch
 
-from model import Model
-from predict import predict
-from config import CONFIG
-from exception_handler import validation_exception_handler, python_exception_handler
-from schema import *
-from util import abs_path
-from rag_pipeline import generate_plant_care_card
+from .model import Model
+from .predict import predict
+from .config import CONFIG
+from .exception_handler import validation_exception_handler, python_exception_handler
+from .schema import PredictionResponse, ErrorResponse, PlantCareResponse
+from .util import abs_path
 
 
 @contextlib.asynccontextmanager
@@ -212,6 +211,8 @@ async def do_plant_care(file: UploadFile = File(...)):
 
     # Step 2: Generate PlantCareCard via RAG pipeline
     try:
+        from .rag_pipeline import generate_plant_care_card
+
         max_revisions = CONFIG.get('MAX_REVISIONS', 2)
         care_card = generate_plant_care_card(top_label, max_revisions=max_revisions)
         card_dict = care_card.model_dump()

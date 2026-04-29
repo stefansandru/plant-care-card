@@ -70,3 +70,4 @@ mistral_model.zip
 .DS_Store
 docker-compose.yml
 docker-compose.override.yml
+project_docs/

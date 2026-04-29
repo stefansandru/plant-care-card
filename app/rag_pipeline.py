@@ -18,7 +18,7 @@ from tavily import TavilyClient
 
 from fastapi.logger import logger
 
-from plant_care_card import PlantCareCard
+from .plant_care_card import PlantCareCard
 
 
 # ---------------------------------------------------------------------------

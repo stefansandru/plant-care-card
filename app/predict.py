@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image
 from torchvision import transforms
 
-from config import CONFIG
+from .config import CONFIG
 
 
 def _build_transforms() -> transforms.Compose:

@@ -9,7 +9,7 @@ from fastapi import Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from config import CONFIG
+from .config import CONFIG
 
 def get_error_response(request, exc) -> dict:
     """
@@ -24,14 +24,11 @@ def get_error_response(request, exc) -> dict:
     # Return traceback info if debug mode is on
     if CONFIG['DEBUG']:
         error_response["traceback"] = "".join(
-            traceback.format_exception(
-                etype=type(exc), value=exc, tb=exc.__traceback__
-            )
+            traceback.format_exception(type(exc), exc, exc.__traceback__)
         )
 
     return error_response
 
-# @router.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """
     Handling error in validating requests

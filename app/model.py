@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import torchvision
 
-from config import CONFIG
+from .config import CONFIG
 
 
 class Model(nn.Module):
