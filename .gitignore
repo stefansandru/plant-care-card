@@ -66,6 +66,9 @@ scratch/
 mistral_model/
 mistral_model.zip
 
+# Secrets
+.env
+
 # Misc
 .DS_Store
 docker-compose.yml
