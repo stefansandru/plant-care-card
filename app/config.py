@@ -9,7 +9,7 @@ import torch
 GLOBAL_CONFIG = {
     "MODEL_PATH": "../efficint_net_b1_model/model_best_weights.pt",
     "CLASS_MAP_PATH": "../efficint_net_b1_model/class_map.json",
-    "IMG_SIZE": (32, 32),
+    "IMG_SIZE": (240, 240),
     "NORMALIZE_MEAN": [0.485, 0.456, 0.406],
     "NORMALIZE_STD": [0.229, 0.224, 0.225],
     "SCALE_FACTOR": 255.0,

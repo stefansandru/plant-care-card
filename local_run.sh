@@ -12,4 +12,4 @@ fi
 pip install -r requirements.txt
 
 # Run locally with uvicorn (--reload restarts on code changes)
-cd app && uvicorn main:app --port 8080 --reload
+uvicorn app.main:app --port 8080 --reload

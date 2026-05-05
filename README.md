@@ -21,6 +21,31 @@ The developed application is a modern API that combines the flexibility of neura
 
 ---
 
+## How to Run (Docker)
+
+The easiest way to run the application is using the pre-built Docker image from Docker Hub:
+[**stef04/plant-care-card**](https://hub.docker.com/r/stef04/plant-care-card)
+
+### 1. Prerequisites (API Keys)
+To enable the RAG (Retrieval-Augmented Generation) capabilities, you need two API keys:
+*   **Mistral API Key**: Get your API key directly from the [Mistral AI Console](https://console.mistral.ai/).
+*   **Tavily API Key**: Get your search API key from [Tavily](https://app.tavily.com/).
+
+### 2. Start the Application
+Run the following command in your terminal. Make sure to replace the placeholder keys with your actual API keys:
+
+```bash
+docker run -d \
+  -p 8080:80 \
+  -e "MISTRAL_API_KEY=your_mistral_key_here" \
+  -e "TAVILY_API_KEY=your_tavily_key_here" \
+  stef04/plant-care-card:latest
+```
+
+Once the container starts, open your browser and go to:
+👉 **http://localhost:8080/docs** to test the API directly via the Swagger UI interface.
+
+---
 ## API Request (Input)
 The `/api/v1/plant-care` endpoint expects a `POST` request containing an image sent as `multipart/form-data`. (Supports formats: `.jpg`, `.png`, `.webp`, `.bmp`, `.tiff`)
 
