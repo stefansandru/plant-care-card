@@ -12,13 +12,15 @@ from typing import List, Optional, TypedDict
 
 from pydantic import BaseModel, Field
 from langchain_core.messages import SystemMessage, HumanMessage
-from langchain_mistralai import ChatMistralAI
+from langchain_mistralai import ChatMistralAI, MistralAIEmbeddings
+from langchain_community.vectorstores import LanceDB
 from langgraph.graph import StateGraph, END
-from tavily import TavilyClient
+import lancedb
 
 from fastapi.logger import logger
 
 from .plant_care_card import PlantCareCard
+from .config import CONFIG
 
 
 # ---------------------------------------------------------------------------
@@ -86,8 +88,8 @@ class Queries(BaseModel):
 
 def _get_llm():
     """Create a Mistral LLM instance."""
-    api_key = os.environ.get("MISTRAL_API_KEY", "")
-    model = os.environ.get("LLM_MODEL", "mistral-small-latest")
+    api_key = CONFIG.get("MISTRAL_API_KEY", "")
+    model = CONFIG.get("LLM_MODEL", "mistral-small-latest")
     return ChatMistralAI(
         model=model,
         temperature=0.3,
@@ -95,14 +97,24 @@ def _get_llm():
     )
 
 
-def _get_tavily():
-    """Create a Tavily search client."""
-    return TavilyClient(api_key=os.environ.get("TAVILY_API_KEY", ""))
+def _get_vectorstore():
+    """Create LanceDB vectorstore instance."""
+    embeddings = MistralAIEmbeddings(
+        model="mistral-embed",
+        api_key=CONFIG.get("MISTRAL_API_KEY", "")
+    )
+    db_uri = CONFIG.get("VECTOR_STORE_URI")
+    return LanceDB(
+        connection=lancedb.connect(db_uri),
+        embedding=embeddings,
+        table_name="plant_care",
+    )
 
 
 def research_node(state: AgentState):
+    print(f"RESEARCHER: Researching plant: {state['plant']}")
     llm = _get_llm()
-    tavily = _get_tavily()
+    vectorstore = _get_vectorstore()
 
     logger.info("RESEARCHER: Planning search queries...")
     messages = [
@@ -113,16 +125,23 @@ def research_node(state: AgentState):
     ]
     queries = llm.with_structured_output(Queries).invoke(messages)
 
-    logger.info(f"RESEARCHER: Search queries planned: {queries.queries}. Searching...")
+    logger.info(f"RESEARCHER: Search queries planned: {queries.queries}. Searching vector store...")
     content = state.get("content", [])
 
     for i, q in enumerate(queries.queries, 1):
         logger.info(f"  Query {i}/{len(queries.queries)}: {q}")
-        response = tavily.search(query=q, max_results=2)
+        
+        # Search the local vector store, optionally filtering by plant name
+        results = vectorstore.similarity_search(
+            query=q,
+            k=2,
+            filter=f"metadata.plant = '{state['plant']}'"
+        )
 
-        for r in response["results"]:
-            source_url = r.get("url", "N/A")
-            content.append(f"Source: {source_url}\n{r['content']}")
+        for r in results:
+            source_url = r.metadata.get("url", "Local Vector Store") if r.metadata else "Local Vector Store"
+            logger.info(f"      * Source: {source_url} | Metadata: {r.metadata}")
+            content.append(f"Source: {source_url}\n{r.page_content}")
 
     logger.info(f"RESEARCHER: Search completed. {len(content)} results collected.")
     return {"content": content}
@@ -259,7 +278,7 @@ def generate_plant_care_card(plant_name: str, max_revisions: int = 2) -> PlantCa
     graph = _build_graph()
 
     initial_state = {
-        "plant": plant_name,
+        "plant": plant_name.title(),
         "content": [],
         "revision_number": 0,
         "max_revisions": max_revisions,

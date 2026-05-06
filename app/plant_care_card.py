@@ -34,6 +34,7 @@ class Season(str, Enum):
     SUMMER = "summer"
     FALL = "fall"
     WINTER = "winter"
+    YEAR_ROUND = "year_round"
 
 
 class GrowthRate(str, Enum):

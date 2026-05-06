@@ -4,20 +4,21 @@
 import os
 import torch
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Config that serves all environment
 GLOBAL_CONFIG = {
-    "MODEL_PATH": "../efficint_net_b1_model/model_best_weights.pt",
-    "CLASS_MAP_PATH": "../efficint_net_b1_model/class_map.json",
+    "MODEL_PATH": os.path.join(BASE_DIR, "resources/efficint_net_b1_model/model_best_weights.pt"),
+    "CLASS_MAP_PATH": os.path.join(BASE_DIR, "resources/efficint_net_b1_model/class_map.json"),
+    "VECTOR_STORE_URI": os.path.join(BASE_DIR, "resources"),
     "IMG_SIZE": (240, 240),
     "NORMALIZE_MEAN": [0.485, 0.456, 0.406],
     "NORMALIZE_STD": [0.229, 0.224, 0.225],
     "SCALE_FACTOR": 255.0,
     "USE_CUDE_IF_AVAILABLE": True,
-    "ROUND_DIGIT": 6,
-    # RAG pipeline (Mistral API + Tavily)
+    "ROUND_DIGIT": 8,
+    # RAG pipeline
     "MISTRAL_API_KEY": os.environ.get("MISTRAL_API_KEY", ""),
-    "TAVILY_API_KEY": os.environ.get("TAVILY_API_KEY", ""),
     "LLM_MODEL": os.environ.get("LLM_MODEL", "mistral-small-latest"),
     "MAX_REVISIONS": int(os.environ.get("MAX_REVISIONS", "2")),
 }
@@ -34,7 +35,7 @@ ENV_CONFIG = {
 
     "production": {
         "DEBUG": False,
-        "ROUND_DIGIT": 3
+        "ROUND_DIGIT": 8
     }
 }
 

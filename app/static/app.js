@@ -160,7 +160,7 @@
     resultImg.src = uploadPreview.src;
     resultName.textContent = r.label;
     resultLatin.textContent = '';
-    confidenceBadge.textContent = `${(r.confidence * 100).toFixed(1)}% confidence`;
+    confidenceBadge.textContent = `${(r.confidence * 100).toFixed(6)}% confidence`;
     resultsSection.hidden = false;
     careCard.hidden = true;
 
@@ -177,7 +177,7 @@
     resultImg.src = uploadPreview.src;
     resultName.textContent = card.common_name || cls.label;
     resultLatin.textContent = card.latin_name || '';
-    confidenceBadge.textContent = `${(cls.confidence * 100).toFixed(1)}% confidence`;
+    confidenceBadge.textContent = `${(cls.confidence * 100).toFixed(6)}% confidence`;
 
     // Summary
     careSummary.textContent = card.summary || '';

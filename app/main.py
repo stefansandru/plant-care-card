@@ -29,6 +29,18 @@ from .exception_handler import validation_exception_handler, python_exception_ha
 from .schema import PredictionResponse, ErrorResponse, PlantCareResponse
 from .util import abs_path
 
+import logging
+from fastapi.logger import logger
+
+# Force the FastAPI logger to output INFO messages
+logger.setLevel(logging.INFO)
+
+# Bind it to the Uvicorn logger so it prints to the terminal
+handler = logging.StreamHandler()
+handler.setFormatter(logging.Formatter("%(levelname)s:     %(message)s"))
+logger.addHandler(handler)
+
+
 
 @contextlib.asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -171,10 +183,10 @@ async def do_plant_care(file: UploadFile = File(...)):
     logger.info(f'input: {file.filename}, content_type: {file.content_type}')
 
     # Validate API keys are set
-    if not os.environ.get('MISTRAL_API_KEY') or not os.environ.get('TAVILY_API_KEY'):
+    if not os.environ.get('MISTRAL_API_KEY'):
         return JSONResponse(status_code=500, content={
             "error": True,
-            "message": "RAG pipeline not configured. Set MISTRAL_API_KEY and TAVILY_API_KEY environment variables.",
+            "message": "RAG pipeline not configured. Set MISTRAL_API_KEY environment variable.",
             "traceback": None
         })
 
